@@ -15,12 +15,12 @@ project1/
 ├── bookclub/
 │   ├── app.py              # Flask routes and SQL queries
 │   ├── requirements.txt    # Python dependencies
+│   ├── .env                # DB credentials (not committed)
 │   ├── static/             # CSS and JS assets
 │   └── templates/          # Jinja2 HTML templates
-├── data_generation/
-│   ├── schema.sql          # PostgreSQL schema (drop + create all tables)
-│   └── fetch_data.py       # Generates and inserts synthetic data via Faker
-└── .env                    # DB credentials (not committed)
+└── data_generation/
+    ├── schema.sql          # PostgreSQL schema (drop + create all tables)
+    └── fetch_data.py       # Generates and inserts synthetic data via Faker
 ```
 
 ## Prerequisites
@@ -46,7 +46,7 @@ On Windows you may need to use the full path to psql, e.g. `"C:\Program Files\Po
 
 ### 2. Configure environment
 
-Create a `.env` file in the project root:
+Create a `.env` file inside the `bookclub/` folder (next to `app.py`):
 
 ```
 DB_HOST=localhost
@@ -109,92 +109,3 @@ The database already has data. Re-run the schema first to drop and recreate all 
 psql -U postgres -d bookclub -f data_generation/schema.sql
 ```
 
-## Deploying to Heroku
-
-This section covers deploying just the Flask app (`bookclub/`) to Heroku. You will need a Heroku account and the Heroku CLI installed (`brew install heroku` or download from the Heroku website).
-
-### 1. Add required files
-
-Create `bookclub/Procfile` (no extension):
-
-```
-web: python app.py
-```
-
-Update `app.py` to read the port from the environment (Heroku assigns a dynamic port):
-
-```python
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-```
-
-### 2. Create the Heroku app
-
-```bash
-cd bookclub
-heroku login
-heroku create your-app-name
-```
-
-### 3. Provision a PostgreSQL database
-
-```bash
-heroku addons:create heroku-postgresql:essential-0
-```
-
-This adds a `DATABASE_URL` environment variable to your app automatically.
-
-### 4. Update the DB connection to support Heroku
-
-Heroku provides a single `DATABASE_URL` instead of separate host/user/password variables. Update `get_db_connection()` in `app.py` to handle both:
-
-```python
-import urllib.parse
-
-def get_db_connection():
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        # Heroku provides postgres:// but psycopg2 needs postgresql://
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql://", 1)
-        conn = psycopg2.connect(database_url)
-    else:
-        conn = psycopg2.connect(
-            host=os.getenv("DB_HOST"),
-            database=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            port=os.getenv("DB_PORT"),
-        )
-    conn.autocommit = False
-    return conn
-```
-
-### 5. Set environment variables
-
-```bash
-heroku config:set SECRET_KEY=your_secret_key
-```
-
-### 6. Load the schema and data
-
-```bash
-heroku pg:psql < ../data_generation/schema.sql
-heroku run python ../data_generation/fetch_data.py
-```
-
-Or connect to the Heroku database directly using pgAdmin with the credentials from:
-
-```bash
-heroku pg:credentials:url
-```
-
-### 7. Deploy
-
-```bash
-git add .
-git commit -m "deploy to heroku"
-git push heroku main
-heroku open
-```
