@@ -2,6 +2,12 @@
 
 A Flask web app backed by PostgreSQL for managing book clubs, members, meetings, reviews, and reading lists. Built for CSCE 608 - Database Systems, Project 1.
 
+
+
+## Live Demo
+
+[https://bookclub-csce608-bc4909af3b88.herokuapp.com/](https://bookclub-csce608-bc4909af3b88.herokuapp.com/)
+
 ## Project Structure
 
 ```
