@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Edit: {{ book.title }}{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('books_list') }}">Books</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('book_detail', book_id=book.book_id) }}">{{ book.title }}</a></li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav>
+
+<div class="card" style="max-width: 700px;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-pencil text-warning"></i> Edit Book</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Title <span class="text-danger">*</span></label>
+                <input type="text" name="title" class="form-control" required
+                       value="{{ request.form.get('title', book.title) }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">ISBN <span class="text-danger">*</span></label>
+                <input type="text" name="isbn" class="form-control" required
+                       value="{{ request.form.get('isbn', book.isbn) }}">
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Year Published</label>
+                    <input type="number" name="year_published" class="form-control"
+                           min="1000" max="2026"
+                           value="{{ request.form.get('year_published', book.year_published or '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Language</label>
+                    <input type="text" name="language" class="form-control"
+                           value="{{ request.form.get('language', book.language or 'English') }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3">{{ request.form.get('description', book.description or '') }}</textarea>
+            </div>
+
+            <!-- Genres (multi-select checkboxes) -->
+            <div class="mb-3">
+                <label class="form-label">Genres</label>
+                {# On POST re-render use form data; on GET use current_genres from DB #}
+                {% if request.method == 'POST' %}
+                    {% set sel_genres = request.form.getlist('genres') %}
+                {% else %}
+                    {% set sel_genres = current_genres | map(attribute='genre') | list %}
+                {% endif %}
+                <div class="border rounded p-2" style="max-height: 160px; overflow-y: auto;">
+                    {% for g in genres %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genres"
+                               value="{{ g.genre }}" id="genre_edit_{{ loop.index }}"
+                               {% if g.genre in sel_genres %}checked{% endif %}>
+                        <label class="form-check-label" for="genre_edit_{{ loop.index }}">{{ g.genre }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Authors (multi-select checkboxes) -->
+            <div class="mb-3">
+                <label class="form-label">Authors</label>
+                {% if request.method == 'POST' %}
+                    {% set sel_author_ids = request.form.getlist('author_ids') %}
+                {% else %}
+                    {% set sel_author_ids = current_authors | map(attribute='author_id') | map('string') | list %}
+                {% endif %}
+                <div class="border rounded p-2" style="max-height: 160px; overflow-y: auto;">
+                    {% for a in authors %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="author_ids"
+                               value="{{ a.author_id }}" id="author_edit_{{ loop.index }}"
+                               {% if a.author_id|string in sel_author_ids %}checked{% endif %}>
+                        <label class="form-check-label" for="author_edit_{{ loop.index }}">{{ a.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Create new author inline -->
+            <div class="card border-secondary mb-4">
+                <div class="card-header py-2">
+                    <span class="fw-semibold small"><i class="bi bi-person-plus"></i> Create New Author (optional)</span>
+                </div>
+                <div class="card-body py-2">
+                    <div class="row g-2">
+                        <div class="col-md-7">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="new_author_name" class="form-control form-control-sm"
+                                   placeholder="Full name"
+                                   value="{{ request.form.get('new_author_name', '') }}">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Nationality</label>
+                            <input type="text" name="new_author_nationality" class="form-control form-control-sm"
+                                   placeholder="e.g. American"
+                                   value="{{ request.form.get('new_author_nationality', '') }}">
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-1">If a name is entered, the new author will be created and linked to this book automatically.</p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-save"></i> Update Book
+                </button>
+                <a href="{{ url_for('book_detail', book_id=book.book_id) }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete -->
+<div class="card border-danger mt-4" style="max-width: 700px;">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="bi bi-trash"></i> Danger Zone</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-3">Deleting this book will also remove all associated reviews, genre assignments, and author assignments.</p>
+        <form method="post" action="{{ url_for('book_delete', book_id=book.book_id) }}"
+              onsubmit="return confirm('Delete book \'{{ book.title }}\'? This cannot be undone.')">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete Book
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

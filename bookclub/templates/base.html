@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Book Club{% endblock %} | Book Club Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+            <i class="bi bi-book-half"></i> Book Club Manager
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}"
+                       href="{{ url_for('index') }}">
+                        <i class="bi bi-grid-3x3-gap"></i> Menu
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint and 'book' in request.endpoint %}active{% endif %}"
+                       href="{{ url_for('books_list') }}">
+                        <span class="badge bg-primary me-1">1</span> Books
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint and 'member' in request.endpoint %}active{% endif %}"
+                       href="{{ url_for('members_list') }}">
+                        <span class="badge bg-success me-1">2</span> Members
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint and ('club' in request.endpoint or 'meeting' in request.endpoint) %}active{% endif %}"
+                       href="{{ url_for('clubs_list') }}">
+                        <span class="badge bg-info me-1">3</span> Clubs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}"
+                       href="{{ url_for('analytics') }}">
+                        <span class="badge bg-warning text-dark me-1">4</span> Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'explore' %}active{% endif %}"
+                       href="{{ url_for('explore') }}">
+                        <span class="badge bg-dark me-1">5</span> Explore
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'manage' %}active{% endif %}"
+                       href="{{ url_for('manage') }}">
+                        <span class="badge bg-secondary me-1">6</span> Manage
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{{ url_for('quit_app') }}">
+                        <i class="bi bi-x-circle"></i> Quit
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Back to menu button (shown on all non-home pages) -->
+{% if request.endpoint != 'index' %}
+<div class="container mt-4 mb-2">
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-grid-3x3-gap"></i> Back to Main Menu
+    </a>
+</div>
+{% endif %}
+
+<footer class="mt-4 py-3 bg-light border-top text-center text-muted small">
+    Book Club Management System, CSCE 608 Database Systems
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

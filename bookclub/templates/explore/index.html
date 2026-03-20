@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Explore Books{% endblock %}
+{% block content %}
+
+<h1 class="mb-4"><i class="bi bi-search text-dark"></i> Explore Books</h1>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
+    </div>
+    <div class="card-body">
+        <form method="get">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Genre</label>
+                    <select name="genre" class="form-select form-select-sm">
+                        <option value="">All Genres</option>
+                        {% for g in genres %}
+                        <option value="{{ g.genre }}" {% if g.genre == filters.genre %}selected{% endif %}>
+                            {{ g.genre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fiction Type</label>
+                    <select name="fiction_type" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        {% for ft in fiction_types %}
+                        <option value="{{ ft }}" {% if ft == filters.fiction_type %}selected{% endif %}>
+                            {{ ft }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Language</label>
+                    <select name="language" class="form-select form-select-sm">
+                        <option value="">All Languages</option>
+                        {% for l in languages %}
+                        <option value="{{ l.language }}" {% if l.language == filters.language %}selected{% endif %}>
+                            {{ l.language }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Author Nationality</label>
+                    <select name="nationality" class="form-select form-select-sm">
+                        <option value="">All Nationalities</option>
+                        {% for n in nationalities %}
+                        <option value="{{ n.nationality }}" {% if n.nationality == filters.nationality %}selected{% endif %}>
+                            {{ n.nationality }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Year From</label>
+                    <input type="number" name="year_from" class="form-control form-control-sm"
+                           min="1000" max="2026" placeholder="e.g. 1990"
+                           value="{{ filters.year_from }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Year To</label>
+                    <input type="number" name="year_to" class="form-control form-control-sm"
+                           min="1000" max="2026" placeholder="e.g. 2024"
+                           value="{{ filters.year_to }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Min Average Rating</label>
+                    <select name="min_rating" class="form-select form-select-sm">
+                        <option value="">Any</option>
+                        <option value="1" {% if filters.min_rating == '1' %}selected{% endif %}>1+</option>
+                        <option value="2" {% if filters.min_rating == '2' %}selected{% endif %}>2+</option>
+                        <option value="3" {% if filters.min_rating == '3' %}selected{% endif %}>3+</option>
+                        <option value="4" {% if filters.min_rating == '4' %}selected{% endif %}>4+</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sort By</label>
+                    <select name="sort" class="form-select form-select-sm">
+                        <option value="title_asc"   {% if filters.sort == 'title_asc'   %}selected{% endif %}>Title A-Z</option>
+                        <option value="title_desc"  {% if filters.sort == 'title_desc'  %}selected{% endif %}>Title Z-A</option>
+                        <option value="year_newest" {% if filters.sort == 'year_newest' %}selected{% endif %}>Year (Newest)</option>
+                        <option value="year_oldest" {% if filters.sort == 'year_oldest' %}selected{% endif %}>Year (Oldest)</option>
+                        <option value="rating_high" {% if filters.sort == 'rating_high' %}selected{% endif %}>Rating (Highest)</option>
+                        <option value="rating_low"  {% if filters.sort == 'rating_low'  %}selected{% endif %}>Rating (Lowest)</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{{ url_for('explore') }}" class="btn btn-outline-secondary btn-sm w-100">
+                        Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">
+        Results
+        <span class="badge bg-secondary">{{ results|length }}</span>
+        {% if results|length == 100 %}
+        <small class="text-muted">(limited to 100)</small>
+        {% endif %}
+    </h5>
+</div>
+
+{% if results %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genre(s)</th>
+                <th>Year</th>
+                <th>Language</th>
+                <th>Avg Rating</th>
+                <th>Reviews</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in results %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('book_detail', book_id=book.book_id) }}" class="fw-semibold text-decoration-none">
+                        {{ book.title }}
+                    </a>
+                </td>
+                <td class="text-muted small">{{ book.author or '-' }}</td>
+                <td class="text-muted small">{{ book.genres or '-' }}</td>
+                <td class="small">{{ book.year_published or '-' }}</td>
+                <td class="small">{{ book.language or '-' }}</td>
+                <td>
+                    {% if book.avg_rating %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-star-fill"></i> {{ book.avg_rating }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>{{ book.review_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    No books match the selected filters. Try broadening your search.
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Add Member{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('members_list') }}">Members</a></li>
+        <li class="breadcrumb-item active">Add Member</li>
+    </ol>
+</nav>
+
+<div class="card" style="max-width: 540px;">
+    <div class="card-header">
+        <h4 class="mb-0"><i class="bi bi-person-plus text-success"></i> Add New Member</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control" required
+                       value="{{ request.form.get('name', '') }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" name="email" class="form-control" required
+                       value="{{ request.form.get('email', '') }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control"
+                       value="{{ request.form.get('phone', '') }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Joined Date</label>
+                <input type="date" name="joined_date" class="form-control"
+                       value="{{ request.form.get('joined_date', '') }}">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-save"></i> Save Member
+                </button>
+                <a href="{{ url_for('members_list') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

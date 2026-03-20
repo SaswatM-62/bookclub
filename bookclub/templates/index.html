@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Main Menu{% endblock %}
+{% block content %}
+
+<!-- Header -->
+<div class="text-center py-4 mb-4 border-bottom">
+    <h1 class="display-5 fw-bold">
+        <i class="bi bi-book-half text-primary"></i> Book Club Management System
+    </h1>
+    <p class="lead text-muted mb-3">
+        Manage books, members, clubs, and meetings from one place.
+    </p>
+    <!-- Quick stats bar -->
+    <div class="d-inline-flex gap-4 flex-wrap justify-content-center">
+        <span class="text-muted small">
+            <i class="bi bi-books text-primary"></i>
+            <strong>{{ stats.total_books or 0 }}</strong> Books
+        </span>
+        <span class="text-muted small">
+            <i class="bi bi-people text-success"></i>
+            <strong>{{ stats.total_members or 0 }}</strong> Members
+        </span>
+        <span class="text-muted small">
+            <i class="bi bi-building text-info"></i>
+            <strong>{{ stats.total_clubs or 0 }}</strong> Clubs
+        </span>
+        <span class="text-muted small">
+            <i class="bi bi-star text-warning"></i>
+            <strong>{{ stats.total_reviews or 0 }}</strong> Reviews
+        </span>
+    </div>
+</div>
+
+<!-- ── MAIN MENU ─────────────────────────────────────────── -->
+<h4 class="text-muted mb-3 text-center">Select an option:</h4>
+
+<div class="row g-3 justify-content-center" style="max-width: 900px; margin: 0 auto;">
+
+    <!-- Option 1 -->
+    <div class="col-md-6">
+        <a href="{{ url_for('books_list') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-primary">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-primary text-white">1</div>
+                    <div>
+                        <h5 class="card-title mb-1">Search &amp; Browse Books</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Search the full book catalog by title or genre.
+                            View ratings, authors, and detailed information.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Option 2 -->
+    <div class="col-md-6">
+        <a href="{{ url_for('members_list') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-success">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-success text-white">2</div>
+                    <div>
+                        <h5 class="card-title mb-1">Member Profiles &amp; Activity</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Look up members, see their club memberships,
+                            review history, and meeting attendance.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Option 3 -->
+    <div class="col-md-6">
+        <a href="{{ url_for('clubs_list') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-info">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-info text-white">3</div>
+                    <div>
+                        <h5 class="card-title mb-1">Clubs &amp; Meetings</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Browse all book clubs, view their members,
+                            meeting schedules, and reading lists.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Option 4 -->
+    <div class="col-md-6">
+        <a href="{{ url_for('analytics') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-warning">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-warning text-dark">4</div>
+                    <div>
+                        <h5 class="card-title mb-1">Analytics &amp; Reports</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Statistical reports including top-rated books,
+                            active members, genre trends, and club progress.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Option 5 -->
+    <div class="col-md-6">
+        <a href="{{ url_for('explore') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-dark">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-dark text-white">5</div>
+                    <div>
+                        <h5 class="card-title mb-1">Advanced Book Explorer</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Filter books by genre, language, year, nationality,
+                            and minimum rating. Sort results any way you like.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Option 6 -->
+    <div class="col-md-6">
+        <a href="{{ url_for('manage') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-secondary">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-secondary text-white">6</div>
+                    <div>
+                        <h5 class="card-title mb-1">Manage Records</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Add, edit, or delete books, members, clubs,
+                            and meetings. Keep your data up to date.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- QUIT -->
+    <div class="col-md-6">
+        <a href="{{ url_for('quit_app') }}" class="text-decoration-none">
+            <div class="card h-100 menu-card border-danger">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <div class="menu-number bg-danger text-white">
+                        <i class="bi bi-x-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title mb-1 text-danger">Quit</h5>
+                        <p class="card-text text-muted small mb-0">
+                            Exit the Book Club Management System.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

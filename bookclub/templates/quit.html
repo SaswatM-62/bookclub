@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Quit{% endblock %}
+{% block content %}
+
+<div class="text-center py-5" style="max-width: 500px; margin: 0 auto;">
+    <i class="bi bi-door-open display-1 text-secondary mb-3 d-block"></i>
+    <h2 class="mb-2">Thanks for using Book Club Manager</h2>
+    <p class="text-muted mb-4">
+        You can safely close this browser tab, or return to the main menu
+        to continue managing your book clubs.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="bi bi-grid-3x3-gap"></i> Back to Main Menu
+        </a>
+        <button onclick="window.close()" class="btn btn-outline-danger">
+            <i class="bi bi-x-circle"></i> Close Tab
+        </button>
+    </div>
+</div>
+
+{% endblock %}

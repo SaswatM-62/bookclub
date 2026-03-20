@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% block title %}Analytics & Reports{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center mb-4">
+    <div>
+        <h1 class="mb-1"><i class="bi bi-bar-chart text-warning"></i> Analytics &amp; Reports</h1>
+        <p class="text-muted mb-0">Top-10 insights across books, members, clubs, and activity.</p>
+    </div>
+</div>
+
+<!-- Jump links -->
+<div class="mb-4 d-flex flex-wrap gap-2">
+    <a href="#top-rated"      class="btn btn-sm btn-outline-warning">Top Rated Books</a>
+    <a href="#active-members" class="btn btn-sm btn-outline-success">Top Reviewers</a>
+    <a href="#multi-club"     class="btn btn-sm btn-outline-info">Most Discussed Books</a>
+    <a href="#authors"        class="btn btn-sm btn-outline-primary">Top Authors</a>
+    <a href="#recent"         class="btn btn-sm btn-outline-secondary">Recent Meetings</a>
+    <a href="#attendance"     class="btn btn-sm btn-outline-dark">Best Attendance</a>
+    <a href="#genres"         class="btn btn-sm btn-outline-dark">Top Genres</a>
+    <a href="#above-avg"      class="btn btn-sm btn-warning">Above-Average Books</a>
+    <a href="#no-review-club" class="btn btn-sm btn-danger">Attendees Without Reviews</a>
+    <a href="#progress"       class="btn btn-sm btn-success">Reading Progress</a>
+    <a href="#activity"       class="btn btn-sm btn-info">Recent Activity</a>
+</div>
+
+<div class="row g-4">
+
+    <!-- 1. Top 10 Highest-Rated Books -->
+    <div class="col-12" id="top-rated">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Top 10 Highest-Rated Books</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if top_rated_books %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>Title</th><th>Author</th><th>Avg Rating</th><th>Reviews</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in top_rated_books %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td class="fw-semibold">{{ row.title }}</td>
+                            <td class="text-muted">{{ row.author or '-' }}</td>
+                            <td><span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> {{ row.avg_rating }}</span></td>
+                            <td>{{ row.review_count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No books with 3+ reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Top 10 Most Active Reviewers -->
+    <div class="col-md-6" id="active-members">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-person-check"></i> Top 10 Most Active Reviewers</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if most_active_members %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>Name</th><th>Reviews</th><th>Avg Given</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in most_active_members %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>{{ row.name }}</td>
+                            <td><span class="badge bg-success">{{ row.review_count }}</span></td>
+                            <td><span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> {{ row.avg_rating_given or '-' }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No reviews recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Top 10 Most Discussed Books -->
+    <div class="col-md-6" id="multi-club">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Top 10 Most Discussed Books</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if books_multi_club %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Title</th><th>Clubs</th><th>Meetings</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in books_multi_club %}
+                        <tr>
+                            <td class="fw-semibold">{{ row.title }}</td>
+                            <td><span class="badge bg-info text-dark">{{ row.club_count }} clubs</span></td>
+                            <td class="text-muted">{{ row.total_meetings }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No books discussed in more than one club yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Top 10 Authors by Average Rating -->
+    <div class="col-md-6" id="authors">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Top 10 Authors by Average Rating</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if author_leaderboard %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>Author</th><th>Nationality</th><th>Avg</th><th>Reviews</th><th>Books</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in author_leaderboard %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>{{ row.name }}</td>
+                            <td class="text-muted small">{{ row.nationality or '-' }}</td>
+                            <td><span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> {{ row.avg_rating }}</span></td>
+                            <td>{{ row.total_reviews }}</td>
+                            <td class="text-muted">{{ row.books_reviewed }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No authors with 3+ reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 10 Most Recently Completed Meetings -->
+    <div class="col-md-6" id="recent">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> 10 Most Recently Completed Meetings</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_completed %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Book</th><th>Club</th><th>Location</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in recent_completed %}
+                        <tr>
+                            <td class="fw-semibold">{{ row.title }}</td>
+                            <td class="text-muted small">{{ row.club_name }}</td>
+                            <td class="text-muted small">{{ row.location or '-' }}</td>
+                            <td class="text-muted small">{{ row.meeting_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No completed meetings yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Top 10 Members by Attendance Rate -->
+    <div class="col-md-6" id="attendance">
+        <div class="card h-100">
+            <div class="card-header" style="background:#6f42c1;color:white;">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Top 10 Members by Attendance Rate</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if attendance_rate %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>Name</th><th>Attended</th><th>Recorded</th><th>Rate</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in attendance_rate %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.meetings_attended }}</td>
+                            <td class="text-muted">{{ row.recorded_meetings }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height:8px;">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width:{{ row.attendance_pct }}%;background:#6f42c1;"></div>
+                                    </div>
+                                    <small>{{ row.attendance_pct }}%</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No attendance records yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Top 10 Genres by Book Count -->
+    <div class="col-md-6" id="genres">
+        <div class="card h-100">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-tags"></i> Top 10 Genres by Book Count</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if popular_genres %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>Genre</th><th>Type</th><th>Books</th><th>Avg Rating</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in popular_genres %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>{{ row.genre }}</td>
+                            <td>
+                                {% if row.fiction_type == 'Fiction' %}
+                                    <span class="badge bg-primary">Fiction</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Non-Fiction</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.book_count }}</td>
+                            <td>
+                                {% if row.avg_rating %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> {{ row.avg_rating }}</span>
+                                {% else %}<span class="text-muted">-</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No genres defined yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. Top 10 Books Above Site Average Rating -->
+    <div class="col-12" id="above-avg">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Top 10 Books Above Site Average Rating</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if above_avg_books %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>Title</th><th>Author</th><th>Avg Rating</th><th>Reviews</th><th>Above Avg By</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in above_avg_books %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td class="fw-semibold">{{ row.title }}</td>
+                            <td class="text-muted">{{ row.author or '-' }}</td>
+                            <td><span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> {{ row.avg_rating }}</span></td>
+                            <td>{{ row.review_count }}</td>
+                            <td><span class="badge bg-success">+{{ row.above_avg_by }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. 10 Most Dedicated Attendees Who Never Reviewed -->
+    <div class="col-md-6" id="no-review-club">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-person-dash"></i> 10 Longest-Serving Attendees Without a Review</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if members_no_review_in_club %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Name</th><th>Email</th><th>Member Since</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in members_no_review_in_club %}
+                        <tr>
+                            <td>{{ row.name }}</td>
+                            <td class="text-muted small">{{ row.email }}</td>
+                            <td class="text-muted small">{{ row.joined_date or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">All attendees have written at least one review.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 11. Top 10 Clubs by Reading List Completion -->
+    <div class="col-md-6" id="progress">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-list-check"></i> Top 10 Clubs by Reading List Completion</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if club_reading_progress %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Club</th><th>Total</th><th>Done</th><th>Reading</th><th>Planned</th><th>% Done</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in club_reading_progress %}
+                        <tr>
+                            <td class="fw-semibold">{{ row.club_name }}</td>
+                            <td>{{ row.total_on_list }}</td>
+                            <td><span class="badge bg-success">{{ row.completed }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ row.reading }}</span></td>
+                            <td><span class="badge bg-secondary">{{ row.planned }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height:8px;">
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                             style="width:{{ row.completion_pct or 0 }}%;"></div>
+                                    </div>
+                                    <small>{{ row.completion_pct or 0 }}%</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No reading list data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 12. 10 Most Recent Book Activities -->
+    <div class="col-12" id="activity">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-intersect"></i> 10 Most Recent Book Activities</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if book_activity_union %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Title</th><th>Source</th><th>Club</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for row in book_activity_union %}
+                        <tr>
+                            <td class="fw-semibold">{{ row.title }}</td>
+                            <td>
+                                {% if row.source == 'Meeting' %}
+                                    <span class="badge bg-primary">Meeting</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ row.source }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ row.club_name }}</td>
+                            <td class="text-muted small">{{ row.activity_date or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No book activity found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

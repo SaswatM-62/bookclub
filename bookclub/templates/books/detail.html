@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('books_list') }}">Books</a></li>
+        <li class="breadcrumb-item active">{{ book.title }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- Book Info -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0 h4"><i class="bi bi-book text-primary"></i> {{ book.title }}</h2>
+                <div>
+                    <a href="{{ url_for('book_edit', book_id=book.book_id) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">ISBN</dt>
+                    <dd class="col-sm-9">{{ book.isbn }}</dd>
+
+                    <dt class="col-sm-3">Year Published</dt>
+                    <dd class="col-sm-9">{{ book.year_published or '-' }}</dd>
+
+                    <dt class="col-sm-3">Language</dt>
+                    <dd class="col-sm-9">{{ book.language or '-' }}</dd>
+
+                    <dt class="col-sm-3">Authors</dt>
+                    <dd class="col-sm-9">
+                        {% if authors %}
+                            {% for a in authors %}
+                                <span class="badge bg-secondary me-1">{{ a.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-3">Genres</dt>
+                    <dd class="col-sm-9">
+                        {% if book_genres %}
+                            {% for g in book_genres %}
+                                <span class="badge bg-info text-dark me-1">{{ g.genre }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </dd>
+
+                    {% if book.description %}
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">{{ book.description }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-quote"></i> Reviews
+                    <span class="badge bg-secondary">{{ book.review_count }}</span>
+                </h5>
+                {% if book.avg_rating %}
+                <span class="badge bg-warning text-dark fs-6">
+                    <i class="bi bi-star-fill"></i> {{ book.avg_rating }} avg
+                </span>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if reviews %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Member</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reviews %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('member_detail', member_id=r.member_id) }}">
+                                    {{ r.member_name }}
+                                </a>
+                            </td>
+                            <td>
+                                {% for i in range(r.rating) %}
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                {% endfor %}
+                                {% for i in range(5 - r.rating) %}
+                                    <i class="bi bi-star text-muted"></i>
+                                {% endfor %}
+                            </td>
+                            <td class="small">{{ r.review_text or '-' }}</td>
+                            <td class="text-muted small">{{ r.review_date or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Add Review -->
+    <div class="col-md-4">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add Review</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('review_add') }}">
+                    <input type="hidden" name="book_id" value="{{ book.book_id }}">
+
+                    <div class="mb-3">
+                        <label class="form-label">Member <span class="text-danger">*</span></label>
+                        <select name="member_id" class="form-select" required>
+                            <option value="">Select a member</option>
+                            {% for m in all_members %}
+                            <option value="{{ m.member_id }}">{{ m.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Rating <span class="text-danger">*</span></label>
+                        <select name="rating" class="form-select" required>
+                            <option value="">Select a rating</option>
+                            <option value="5">★★★★★ (5)</option>
+                            <option value="4">★★★★ (4)</option>
+                            <option value="3">★★★ (3)</option>
+                            <option value="2">★★ (2)</option>
+                            <option value="1">★ (1)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Review Text</label>
+                        <textarea name="review_text" class="form-control" rows="3"
+                                  placeholder="Optional review…"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Review Date</label>
+                        <input type="date" name="review_date" class="form-control">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-send"></i> Submit Review
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

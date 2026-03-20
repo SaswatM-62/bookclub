@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Add Club{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('clubs_list') }}">Clubs</a></li>
+        <li class="breadcrumb-item active">Add Club</li>
+    </ol>
+</nav>
+
+<div class="card" style="max-width: 540px;">
+    <div class="card-header">
+        <h4 class="mb-0"><i class="bi bi-plus-circle text-info"></i> Add New Club</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Club Name <span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control" required
+                       value="{{ request.form.get('name', '') }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3">{{ request.form.get('description', '') }}</textarea>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Founded Date</label>
+                    <input type="date" name="founded_date" class="form-control"
+                           value="{{ request.form.get('founded_date', '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Meeting Frequency</label>
+                    <select name="meeting_frequency" class="form-select">
+                        <option value="">Select...</option>
+                        {% for freq in ['Weekly', 'Biweekly', 'Monthly', 'Quarterly'] %}
+                        <option value="{{ freq }}" {% if request.form.get('meeting_frequency') == freq %}selected{% endif %}>
+                            {{ freq }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-info text-white">
+                    <i class="bi bi-save"></i> Save Club
+                </button>
+                <a href="{{ url_for('clubs_list') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

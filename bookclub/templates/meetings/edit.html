@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Edit Meeting{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('meetings_list') }}">Meetings</a></li>
+        <li class="breadcrumb-item active">Edit Meeting</li>
+    </ol>
+</nav>
+
+<div class="card" style="max-width: 580px;">
+    <div class="card-header">
+        <h4 class="mb-0"><i class="bi bi-pencil text-warning"></i> Edit Meeting</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Club <span class="text-danger">*</span></label>
+                <select name="club_id" class="form-select" required>
+                    <option value="">Select a club</option>
+                    {% set cur_club = request.form.get('club_id', meeting.club_id|string) %}
+                    {% for c in clubs %}
+                    <option value="{{ c.club_id }}" {% if c.club_id|string == cur_club %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Book</label>
+                <select name="book_id" class="form-select">
+                    <option value="">None</option>
+                    {% set cur_book = request.form.get('book_id', meeting.book_id|string if meeting.book_id else '') %}
+                    {% for b in books %}
+                    <option value="{{ b.book_id }}" {% if b.book_id|string == cur_book %}selected{% endif %}>
+                        {{ b.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Meeting Date <span class="text-danger">*</span></label>
+                    <input type="date" name="meeting_date" class="form-control" required
+                           value="{{ request.form.get('meeting_date', meeting.meeting_date|string if meeting.meeting_date else '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" name="duration_minutes" class="form-control" min="1"
+                           value="{{ request.form.get('duration_minutes', meeting.duration_minutes or '') }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control"
+                       value="{{ request.form.get('location', meeting.location or '') }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    {% set cur = request.form.get('status', meeting.status) %}
+                    <option value="planned" {% if cur == 'planned' %}selected{% endif %}>Planned</option>
+                    <option value="completed" {% if cur == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Notes</label>
+                <textarea name="notes" class="form-control" rows="3">{{ request.form.get('notes', meeting.notes or '') }}</textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-save"></i> Update Meeting
+                </button>
+                <a href="{{ url_for('meetings_list') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-danger mt-4" style="max-width: 580px;">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="bi bi-trash"></i> Danger Zone</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" action="{{ url_for('meeting_delete', meeting_id=meeting.meeting_id) }}"
+              onsubmit="return confirm('Delete this meeting? This cannot be undone.')">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete Meeting
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
